@@ -3242,6 +3242,11 @@ class LaxBackedNumpyTests(jtu.JaxTestCase):
     self.assertTrue(xla.is_device_constant(jnp.arange(77)))
     self.assertTrue(xla.is_device_constant(jnp.arange(77, dtype=jnp.int32)))
 
+  def testArangeJit(self):
+    ans = api.jit(lambda: jnp.arange(5))()
+    expected = np.arange(5)
+    self.assertAllClose(ans, expected)
+
   def testIssue830(self):
     a = jnp.arange(4, dtype=jnp.complex64)
     self.assertEqual(a.dtype, jnp.complex64)
@@ -3848,7 +3853,7 @@ class LaxBackedNumpyTests(jtu.JaxTestCase):
         lambda: jnp.zeros(1.))
     self.assertRaisesRegex(
         TypeError,
-        "Shapes must be 1D sequences of concrete values of integer type.*\n"
+        r"Shapes must be 1D sequences of concrete values of integer type.*\n"
         "If using `jit`, try using `static_argnums` or applying `jit` to smaller subfunctions.",
         lambda: api.jit(jnp.zeros)(2))
 
